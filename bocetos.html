@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<style>
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.heart-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+  color: #aaa; /* color inicial gris para corazón vacío */
+  opacity: 0;
+  pointer-events: auto;
+}
+
+.image-wrapper:hover .heart-icon {
+  opacity: 1;
+}
+
+.heart-icon.favorito {
+  color: red;
+  opacity: 1;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-icon.animate {
+  animation: heartbeat 0.5s ease forwards;
+}
+</style>
+
+  <meta charset="UTF-8" />
+  <title>Bocetos - Mi Vlog Visual</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #75b2ee, #7ebdfcc7);
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #000000;
+      margin-bottom: 20px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .gallery img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      filter: grayscale(60%);
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      filter: grayscale(0%);
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 30px;
+      background: #6699cc;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 15px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    a:hover {
+      background: #4d7aa8;
+    }
+  </style>
+</head>
+<body>
+  <h1>🖋️ Bocetos</h1>
+
+    <script>
+    // FUNCIONALIDAD CORAZÓN (favoritos con animación y localStorage)
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hearts = document.querySelectorAll('.heart-icon');
+
+  // Cargar favoritos guardados
+  const favoritosGuardados = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+  // Marcar los favoritos ya guardados
+  hearts.forEach(heart => {
+    const src = heart.dataset.src;
+    if (favoritosGuardados.includes(src)) {
+      heart.textContent = '❤️';
+      heart.classList.add('favorito');
+    } else {
+      heart.textContent = '🤍';
+      heart.classList.remove('favorito');
+    }
+  });
+
+  hearts.forEach(heart => {
+    heart.addEventListener('mouseenter', () => {
+      if (!heart.classList.contains('favorito')) {
+        heart.textContent = '🤍'; // Corazón vacío en hover si no es favorito
+      }
+    });
+
+    heart.addEventListener('mouseleave', () => {
+      if (!heart.classList.contains('favorito')) {
+        heart.textContent = '🤍';
+      } else {
+        heart.textContent = '❤️'; // Corazón rojo si es favorito
+      }
+    });
+
+    heart.addEventListener('click', () => {
+      const src = heart.dataset.src;
+      const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+      if (heart.classList.contains('favorito')) {
+        // Quitar favorito
+        heart.classList.remove('favorito');
+        heart.textContent = '🤍';
+        const index = favoritos.indexOf(src);
+        if (index > -1) favoritos.splice(index, 1);
+      } else {
+        // Añadir favorito
+        heart.classList.add('favorito');
+        heart.textContent = '❤️';
+
+        // Animación: añadir clase animate y luego quitarla
+        heart.classList.add('animate');
+        setTimeout(() => {
+          heart.classList.remove('animate');
+        }, 500);
+
+        favoritos.push(src);
+      }
+
+      localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    });
+  });
+});
+
+</script>
+
+<section class="gallery">
+  <div class="grid">
+    <div class="image-wrapper">
+      <img src="imagenes/1.jpg" alt="Mural águila y rostro" />
+      <div class="heart-icon" data-src="imagenes/1.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/2.jpg" alt="Casa con árbol y autos" />
+      <div class="heart-icon" data-src="imagenes/2.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/3.jpg" alt="Parque con combi verde" />
+      <div class="heart-icon" data-src="imagenes/3.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/4.jpg" alt="Mural águila bandera" />
+      <div class="heart-icon" data-src="imagenes/4.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/5.jpg" alt="Calle con motociclista" />
+      <div class="heart-icon" data-src="imagenes/5.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/6.jpg" alt="Camión azul frente a edificio rosa" />
+      <div class="heart-icon" data-src="imagenes/6.jpg">🤍</div>
+    </div>
+  </div>
+</section>
+
+
+  <a href="vlog.html">⬅ Volver al inicio</a>
+</body>
+</html>

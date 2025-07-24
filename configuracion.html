@@ -1,0 +1,194 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Configuración - Mi Vlog Visual</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #ffffff);
+            color: #333;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ff4d4d;
+            margin-bottom: 40px;
+        }
+
+        form {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #cc3b3b;
+        }
+
+        #btn-back {
+            margin-top: 30px;
+            background: #777;
+            width: 320px;
+        }
+
+        #btn-back:hover {
+            background: #555;
+        }
+
+        #message {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #error-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Configuración</h1>
+
+    <form id="config-form">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" required />
+
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" required />
+
+        <label for="password">Nueva contraseña</label>
+        <input type="password" id="password" placeholder="Dejar vacío para no cambiar" />
+
+        <button type="submit">Guardar Cambios</button>
+        <div id="message"></div>
+        <div id="error-message"></div>
+    </form>
+
+    <button id="btn-back">Volver al Vlog</button>
+
+    <script>
+        const form = document.getElementById('config-form');
+        const message = document.getElementById('message');
+        const errorMessage = document.getElementById('error-message');
+        const btnBack = document.getElementById('btn-back');
+
+        // Cargar datos actuales del usuario
+        function loadUserData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('No hay usuario logueado. Redirigiendo...');
+                window.location.href = 'vlog.html';
+                return;
+            }
+            document.getElementById('name').value = currentUser.name;
+            document.getElementById('email').value = currentUser.email;
+        }
+
+        // Guardar cambios
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            message.textContent = '';
+            errorMessage.textContent = '';
+
+            const newName = document.getElementById('name').value.trim();
+            const newEmail = document.getElementById('email').value.trim();
+            const newPassword = document.getElementById('password').value;
+
+            if (!newName || !newEmail) {
+                errorMessage.textContent = 'Nombre y correo son obligatorios.';
+                return;
+            }
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                errorMessage.textContent = 'Usuario no encontrado, inicia sesión de nuevo.';
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+            // Verificar que el nuevo email no esté usado por otro usuario
+            const emailUsed = users.some(u => u.email === newEmail && u.email !== currentUser.email);
+            if (emailUsed) {
+                errorMessage.textContent = 'El correo electrónico ya está en uso por otro usuario.';
+                return;
+            }
+
+            // Actualizar usuario en array
+            users = users.map(u => {
+                if (u.email === currentUser.email) {
+                    return {
+                        name: newName,
+                        email: newEmail,
+                        password: newPassword ? newPassword : u.password
+                    };
+                }
+                return u;
+            });
+
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Actualizar currentUser
+            const updatedUser = {
+                name: newName,
+                email: newEmail,
+                password: newPassword ? newPassword : currentUser.password
+            };
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+            message.textContent = 'Configuración guardada correctamente.';
+            document.getElementById('password').value = '';
+        });
+
+        btnBack.addEventListener('click', () => {
+            window.location.href = 'vlog.html';
+        });
+
+        window.onload = loadUserData;
+    </script>
+    
+</body>
+</html>

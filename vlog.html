@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.heart-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+  color: #aaa; /* color inicial gris para corazón vacío */
+  opacity: 0;
+  pointer-events: auto;
+}
+
+.image-wrapper:hover .heart-icon {
+  opacity: 1;
+}
+
+.heart-icon.favorito {
+  color: red;
+  opacity: 1;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-icon.animate {
+  animation: heartbeat 0.5s ease forwards;
+}
+</style>
+    <meta charset="UTF-8" />
+    <title>Fotos y dibujos de mi y mi bro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #ffffff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            animation: fadeInDown 1s ease-out;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+        }
+
+        .auth-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .auth-buttons button {
+            padding: 8px 16px;
+            background: white;
+            color: #ff4d4d;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        .auth-buttons button:hover {
+            background-color: #ffd6d6;
+        }
+
+        /* Botón de configuración */
+        #btn-config {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+        #btn-config:hover {
+            background-color: #ffd6d6;
+        }
+        #btn-config img {
+            width: 20px;
+            height: 20px;
+        }
+
+        #user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        #user-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        #user-info button {
+            margin-left: 10px;
+            background: #fff;
+            border: none;
+            border-radius: 15px;
+            color: #ff4d4d;
+            font-weight: bold;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        #user-info button:hover {
+            background-color: #ffd6d6;
+        }
+
+        .gallery {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: auto;
+            flex-grow: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .grid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            opacity: 0;
+            animation: fadeInZoom 1s forwards;
+            cursor: pointer;
+        }
+
+        .grid img:hover {
+            transform: scale(1.05);
+        }
+
+        .grid img:nth-child(1) { animation-delay: 0.1s; }
+        .grid img:nth-child(2) { animation-delay: 0.2s; }
+        .grid img:nth-child(3) { animation-delay: 0.3s; }
+        .grid img:nth-child(4) { animation-delay: 0.4s; }
+        .grid img:nth-child(5) { animation-delay: 0.5s; }
+        .grid img:nth-child(6) { animation-delay: 0.6s; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #222;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 320px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            position: relative;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #ff4d4d;
+            text-align: center;
+        }
+
+        .modal-content label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .modal-content button:hover {
+            background-color: #cc3b3b;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5em;
+            color: #ff4d4d;
+            cursor: pointer;
+        }
+
+        /* Image zoom modal */
+        #image-modal {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 2000;
+        }
+        #image-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        #image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.7);
+            animation: zoomIn 0.3s ease forwards;
+            cursor: pointer;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInZoom {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+</html>
+
+</script>
+
+<body>
+
+<script>
+    // FUNCIONALIDAD CORAZÓN (favoritos con animación y localStorage)
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hearts = document.querySelectorAll('.heart-icon');
+
+  // Cargar favoritos guardados
+  const favoritosGuardados = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+  // Marcar los favoritos ya guardados
+  hearts.forEach(heart => {
+    const src = heart.dataset.src;
+    if (favoritosGuardados.includes(src)) {
+      heart.textContent = '❤️';
+      heart.classList.add('favorito');
+    } else {
+      heart.textContent = '🤍';
+      heart.classList.remove('favorito');
+    }
+  });
+
+  hearts.forEach(heart => {
+    heart.addEventListener('mouseenter', () => {
+      if (!heart.classList.contains('favorito')) {
+        heart.textContent = '🤍'; // Corazón vacío en hover si no es favorito
+      }
+    });
+
+    heart.addEventListener('mouseleave', () => {
+      if (!heart.classList.contains('favorito')) {
+        heart.textContent = '🤍';
+      } else {
+        heart.textContent = '❤️'; // Corazón rojo si es favorito
+      }
+    });
+
+    heart.addEventListener('click', () => {
+      const src = heart.dataset.src;
+      const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+      if (heart.classList.contains('favorito')) {
+        // Quitar favorito
+        heart.classList.remove('favorito');
+        heart.textContent = '🤍';
+        const index = favoritos.indexOf(src);
+        if (index > -1) favoritos.splice(index, 1);
+      } else {
+        // Añadir favorito
+        heart.classList.add('favorito');
+        heart.textContent = '❤️';
+
+        // Animación: añadir clase animate y luego quitarla
+        heart.classList.add('animate');
+        setTimeout(() => {
+          heart.classList.remove('animate');
+        }, 500);
+
+        favoritos.push(src);
+      }
+
+      localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    });
+  });
+});
+
+</script>
+
+<header>
+    <h1>Fotos y dibujos</h1>
+    <div class="auth-buttons" id="auth-buttons">
+        <button id="btn-login">Iniciar Sesión</button>
+        <button id="btn-register">Registrarse</button>
+        <a href="configuracion.html" id="btn-config" title="Configuración">
+            <img src="https://cdn-icons-png.flaticon.com/512/126/126472.png" alt="Configuración" />
+        </a>
+    </div>
+    <div id="user-info">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User icon" />
+        <span id="user-name"></span>
+        <button id="logout-btn">Cerrar sesión</button>
+    </div>
+</header>
+
+<!-- 🌟 MENÚ DESPLEGABLE CON ANIMACIÓN SUAVE -->
+<style>
+.menu {
+  background-color: #ffeaea;
+  padding: 10px 20px;
+  text-align: center;
+  position: relative; /* 🔧 Esto es importante */
+  overflow: visible;   /* Asegura que el submenu se muestre */
+  max-height: 100px;
+}
+
+  .menu ul {
+    list-style: none;
+    display: inline-flex;
+    gap: 40px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu ul li {
+    position: relative;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #ff4d4d;
+  }
+
+  .menu ul li .submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 10px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+    width: max-content;
+    min-width: 150px;
+    max-height: 65px;
+  }
+
+  .menu ul li:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(5px);
+  }
+
+  .menu .submenu li {
+    padding: 8px 20px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .menu .submenu li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+  }
+
+  .menu .submenu li a:hover {
+    background-color: #ffeaea;
+    color: #ff4d4d;
+    border-radius: 5px;
+  }
+</style>
+
+<nav class="menu">
+  <ul>
+    <li>
+      <span>📷 Fotos</span>
+      <ul class="submenu">
+        <li><a href="fotos.html">Ver todas</a></li>
+        <li><a href="favoritos.html">Favoritas</a></li>
+        <li><a href="vlog.html#recientes">Recientes</a></li>
+<head>
+<meta charset="UTF-8" />
+<title>Favoritos - Mi Vlog Visual</title>
+<style>
+  /* Reutilizamos el estilo base para consistencia */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+  }
+
+  header {
+      background-color: #ff4d4d;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 15px;
+      margin-bottom: 20px;
+  }
+
+  header h1 {
+      font-size: 2em;
+  }
+
+  button#volver {
+      margin: 0 auto 30px auto;
+      padding: 10px 20px;
+      background: #ff4d4d;
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: block;
+      max-width: 200px;
+  }
+  button#volver:hover {
+      background-color: #cc3b3b;
+  }
+
+  .gallery {
+      max-width: 1000px;
+      margin: 0 auto;
+      flex-grow: 1;
+  }
+
+  .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+  }
+
+  .grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+  }
+  .grid img:hover {
+      transform: scale(1.05);
+  }
+
+  footer {
+      text-align: center;
+      padding: 20px;
+      background: #222;
+      color: #aaa;
+      font-size: 0.9em;
+      margin-top: 40px;
+      border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<section class="gallery">
+  <div class="grid" id="favoritos-grid">
+    <!-- Aquí se insertarán las imágenes favoritas -->
+  </div>
+</section>
+
+<script>
+  // Botón para volver a la página principal
+  document.getElementById('volver').addEventListener('click', () => {
+    window.location.href = 'index.html'; // Cambia a la ruta correcta de tu página principal
+  });
+
+  // Recuperar favoritos del localStorage
+  // Supongo que guardaste los favoritos en localStorage con la key 'favoritos' 
+  // y es un array con los src de las imágenes favoritas
+  const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
+  const grid = document.getElementById('favoritos-grid');
+
+  if (favoritos.length === 0) {
+    grid.innerHTML = '<p>No tienes imágenes favoritas todavía.</p>';
+  } else {
+    // Crear elementos <img> para cada favorito y agregarlos al grid
+    favoritos.forEach(src => {
+      const div = document.createElement('div');
+      div.className = 'image-wrapper';
+
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'Imagen favorita';
+      div.appendChild(img);
+
+      grid.appendChild(div);
+    });
+  }
+</script>
+
+</body>
+</html>
+</a></li>
+      </ul>
+    </li>
+    <li>
+      <span>🎨 Dibujos</span>
+      <ul class="submenu">
+        <li><a href="dibujos.html">Ver todos</a></li>
+        <li><a href="favoritos.html">Favoritos</a></li>
+        <li><a href="bocetos.html">Bocetos</a></li>
+        <li><a href="Squid Game.html">Squid Game</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+<section class="gallery">
+  <div class="grid">
+    <div class="image-wrapper">
+      <img src="imagenes/1.jpg" alt="Mural águila y rostro" />
+      <div class="heart-icon" data-src="imagenes/1.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/2.jpg" alt="Casa con árbol y autos" />
+      <div class="heart-icon" data-src="imagenes/2.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/3.jpg" alt="Parque con combi verde" />
+      <div class="heart-icon" data-src="imagenes/3.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/4.jpg" alt="Mural águila bandera" />
+      <div class="heart-icon" data-src="imagenes/4.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/5.jpg" alt="Calle con motociclista" />
+      <div class="heart-icon" data-src="imagenes/5.jpg">🤍</div>
+    </div>
+    <div class="image-wrapper">
+      <img src="imagenes/6.jpg" alt="Camión azul frente a edificio rosa" />
+      <div class="heart-icon" data-src="imagenes/6.jpg">🤍</div>
+    </div>
+  </div>
+</section>
+
+
+
+<footer>
+    © 2025 Mi Vlog Visual. Todos los derechos reservados.
+</footer>
+
+<!-- Modal Login -->
+<div class="modal" id="login-modal">
+    <div class="modal-content">
+        <span class="close-btn" id="login-close">&times;</span>
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <label for="login-email">Correo electrónico</label>
+            <input type="email" id="login-email" required />
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" required />
+            <button type="submit">Entrar</button>
+            <button type="button" id="forgot-password" style="margin-top: 10px; background: transparent; color: #ff4d4d; border: none; cursor: pointer; font-size: 0.9em; text-decoration: underline;">
+                ¿Olvidaste tu contraseña?
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ... (tu código JS ya existente)
+
+    // Manejar botón "¿Olvidaste tu contraseña?"
+    document.getElementById('forgot-password').addEventListener('click', () => {
+        alert('Funcionalidad de recuperación de contraseña en desarrollo.');
+    });
+</script>
+
+<!-- Modal Register -->
+<div class="modal" id="register-modal">
+    <div class="modal-content">
+        <span class="close-btn" id="register-close">&times;</span>
+        <h2>Registrarse</h2>
+        <form id="registerForm">
+            <label for="register-name">Nombre</label>
+            <input type="text" id="register-name" required />
+            <label for="register-email">Correo electrónico</label>
+            <input type="email" id="register-email" required />
+            <label for="register-password">Contraseña</label>
+            <input type="password" id="register-password" required />
+            <button type="submit">Crear cuenta</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Image Zoom -->
+<div id="image-modal">
+    <img src="" alt="Imagen ampliada" />
+</div>
+
+<script>
+    // Selección de elementos
+    const loginBtn = document.getElementById('btn-login');
+    const registerBtn = document.getElementById('btn-register');
+    const loginModal = document.getElementById('login-modal');
+    const registerModal = document.getElementById('register-modal');
+    const loginClose = document.getElementById('login-close');
+    const registerClose = document.getElementById('register-close');
+    const authButtons = document.getElementById('auth-buttons');
+    const userInfo = document.getElementById('user-info');
+    const userNameSpan = document.getElementById('user-name');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // Mostrar modales
+    loginBtn.addEventListener('click', () => loginModal.classList.add('active'));
+    registerBtn.addEventListener('click', () => registerModal.classList.add('active'));
+
+    // Cerrar modales
+    loginClose.addEventListener('click', () => loginModal.classList.remove('active'));
+    registerClose.addEventListener('click', () => registerModal.classList.remove('active'));
+
+    // Cerrar modales al hacer clic fuera del contenido
+    window.addEventListener('click', e => {
+        if (e.target === loginModal) loginModal.classList.remove('active');
+        if (e.target === registerModal) registerModal.classList.remove('active');
+        if (e.target === imageModal) imageModal.classList.remove('active');
+    });
+
+    // Obtener usuarios guardados (simulación local)
+    const getUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
+    const saveUsers = (users) => localStorage.setItem('users', JSON.stringify(users));
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const users = getUsers();
+        const user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateUIOnLogin(user);
+            loginModal.classList.remove('active');
+        } else {
+            alert('Usuario o contraseña incorrectos');
+        }
+    });
+
+    // Register
+    document.getElementById('registerForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        let users = getUsers();
+
+        if (users.some(u => u.email === email)) {
+            alert('Este correo ya está registrado');
+            return;
+        }
+
+        const newUser = { name, email, password };
+        users.push(newUser);
+        saveUsers(users);
+        alert('Registro exitoso, ahora puedes iniciar sesión');
+        registerModal.classList.remove('active');
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        updateUIOnLogout();
+    });
+
+    // Actualizar UI al iniciar sesión
+    function updateUIOnLogin(user) {
+        authButtons.style.display = 'none';
+        userInfo.style.display = 'flex';
+        userNameSpan.textContent = user.name;
+    }
+
+    // Actualizar UI al cerrar sesión
+    function updateUIOnLogout() {
+        authButtons.style.display = 'flex';
+        userInfo.style.display = 'none';
+        userNameSpan.textContent = '';
+    }
+
+    // Comprobar si hay usuario logueado al cargar la página
+    window.addEventListener('load', () => {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            updateUIOnLogin(currentUser);
+        } else {
+            updateUIOnLogout();
+        }
+    });
+
+    // Modal zoom de imágenes
+    const gridImages = document.querySelectorAll('.grid img');
+    const imageModal = document.getElementById('image-modal');
+    const imageModalImg = imageModal.querySelector('img');
+
+    gridImages.forEach(img => {
+        img.addEventListener('click', () => {
+            imageModalImg.src = img.src;
+            imageModal.classList.add('active');
+        });
+    });
+
+    imageModal.addEventListener('click', () => {
+        imageModal.classList.remove('active');
+    });
+</script>
+
+</body>
+</html>
